@@ -1,13 +1,12 @@
 
-//#include "main.h"
+#include "main.h"
 
-//using namespace ogs;
+using namespace ogs;
 
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
-    /*
     main::Example::Parameters parameters;
     
     auto example = new main::Example(parameters);
@@ -15,7 +14,6 @@ int main(int argc, char *argv[])
     
     example->app->run();
     delete example;
-    */
 
     printf("The app was terminated\n");
 

@@ -2,11 +2,15 @@
 #ifndef OGS_H
 #define OGS_H
 
+/*
 #include <osgViewer/Viewer>
 #include <osgGA/TrackballManipulator>
 
 #include <osg/Camera>
+*/
 
+#include <map>
+#include <string>
 
 
 namespace ogs
@@ -27,6 +31,7 @@ namespace log
 namespace render
 {
 
+    /*
 //! Create graphics context for desktop: linux, macos, windows.
 osg::GraphicsContext *createGraphicsContext(
     const std::string &title,
@@ -71,6 +76,7 @@ void setupCamera(
     // Configure projection.
     cam->setProjectionMatrixAsPerspective(fovy, aspect, 1, 1000);
 }
+*/
 
 }
 
@@ -93,18 +99,22 @@ class Application
             
         }
 
+        /*
     public:
         void frame()
         {
             this->viewer->frame();
         }
+        */
     public:
         void run()
         {
+            /*
             while (!this->viewer->done())
             {
                 this->frame();
             }
+            */
         }
     public:
         void setupWindow(
@@ -114,17 +124,22 @@ class Application
             int width,
             int height
         ) {
+            /*
             osg::GraphicsContext *gc =
                 render::createGraphicsContext(title, x, y, width, height);
             // Configure viewer's camera with FOVY and window size.
             osg::Camera *cam = this->viewer->getCamera();
             render::setupCamera(cam, gc, 30, width, height);
+        */
         }
 
     private:
+        /*
         osgViewer::Viewer *viewer;
+        */
         void setupRendering()
         {
+            /*
             // Create OpenSceneGraph viewer.
             this->viewer = new osgViewer::Viewer;
             // Use single thread: CRITICAL for mobile and web because
@@ -133,14 +148,17 @@ class Application
             // Create manipulator: CRITICAL for mobile and web to focus on the
             // nodes in the scene.
             this->viewer->setCameraManipulator(new osgGA::TrackballManipulator);
+            */
         }
         void tearRenderingDown()
         {
+            /*
             delete this->viewer;
+            */
         }
 };
 
-const auto EXAMPLE_TITLE = "OGS-01: Empty screen";
+const auto EXAMPLE_TITLE = "Single-file OSG research";
 
 struct Example
 {
