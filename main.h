@@ -9,6 +9,8 @@
 #include <osg/Camera>
 */
 
+#include "OpenSceneGraph.h"
+
 #include <map>
 #include <string>
 
@@ -31,7 +33,6 @@ namespace log
 namespace render
 {
 
-    /*
 //! Create graphics context for desktop: linux, macos, windows.
 osg::GraphicsContext *createGraphicsContext(
     const std::string &title,
@@ -57,6 +58,7 @@ osg::GraphicsContext *createGraphicsContext(
 
     return osg::GraphicsContext::createGraphicsContext(traits);
 }
+/*
 // Configure camera with common defaults.
 void setupCamera(
     osg::Camera *cam,

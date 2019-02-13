@@ -6,7 +6,7 @@ SET(BINARY_NAME "sfosg")
 #INCLUDE(${OGS_DIR}/${STAGE}/OpenSceneGraph/CMakeLists.txt)
 
 # Create and link executable.
-ADD_EXECUTABLE(${BINARY_NAME} main.cpp)
+ADD_EXECUTABLE(${BINARY_NAME} OpenSceneGraph.cpp main.cpp)
 #TARGET_LINK_LIBRARIES(
 #    ${BINARY_NAME}
 #    osgViewer
