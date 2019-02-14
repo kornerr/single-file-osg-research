@@ -1,4 +1,112 @@
 
+// OSGFILE OpenThreads/Config
+
+#define _OPENTHREADS_ATOMIC_USE_GCC_BUILTINS
+/* #undef _OPENTHREADS_ATOMIC_USE_MIPOSPRO_BUILTINS */
+/* #undef _OPENTHREADS_ATOMIC_USE_SUN */
+/* #undef _OPENTHREADS_ATOMIC_USE_WIN32_INTERLOCKED */
+/* #undef _OPENTHREADS_ATOMIC_USE_BSD_ATOMIC */
+/* #undef _OPENTHREADS_ATOMIC_USE_MUTEX */
+/* #undef OT_LIBRARY_STATIC */
+
+
+// OSGFILE include/OpenThreads/Exports
+
+//#include <OpenThreads/Config>
+
+#ifndef WIN32
+    #define OPENTHREAD_EXPORT_DIRECTIVE
+#else
+    #if defined( OT_LIBRARY_STATIC )
+        #define OPENTHREAD_EXPORT_DIRECTIVE
+    #elif defined( OPENTHREADS_EXPORTS )
+        #define OPENTHREAD_EXPORT_DIRECTIVE __declspec(dllexport)
+    #else
+        #define OPENTHREAD_EXPORT_DIRECTIVE __declspec(dllimport)
+    #endif
+#endif
+
+
+// OSGFILE include/OpenThreads/Mutex
+
+//#include <OpenThreads/Exports>
+
+namespace OpenThreads {
+
+/**
+ *  @class Mutex
+ *  @brief  This class provides an object-oriented thread mutex interface.
+ */
+class OPENTHREAD_EXPORT_DIRECTIVE Mutex {
+
+    friend class Condition;
+
+public:
+
+    enum MutexType
+    {
+        MUTEX_NORMAL,
+        MUTEX_RECURSIVE
+    };
+
+    /**
+     *  Constructor
+     */
+    Mutex(MutexType type=MUTEX_NORMAL);
+
+    /**
+     *  Destructor
+     */
+    virtual ~Mutex();
+
+
+    MutexType getMutexType() const { return _mutexType; }
+
+
+    /**
+     *  Lock the mutex
+     *
+     *  @return 0 if normal, -1 if errno set, errno code otherwise.
+     */
+    virtual int lock();
+
+    /**
+     *  Unlock the mutex
+     *
+     *  @return 0 if normal, -1 if errno set, errno code otherwise.
+     */
+    virtual int unlock();
+
+    /**
+     *  Test if mutex can be locked.
+     *
+     *  @return 0 if normal, -1 if errno set, errno code otherwise.
+     */
+    virtual int trylock();
+
+private:
+
+    /**
+     *  Private copy constructor, to prevent tampering.
+     */
+    Mutex(const Mutex &/*m*/) {};
+
+    /**
+     *  Private copy assignment, to prevent tampering.
+     */
+    Mutex &operator=(const Mutex &/*m*/) {return *(this);};
+
+    /**
+     *  Implementation-specific private data.
+     */
+    void *_prvData;
+    MutexType _mutexType;
+
+};
+
+}
+
+
 // OSGFILE include/osg/Export
 
 //#include<osg/Config>
