@@ -1815,6 +1815,965 @@ template<class T> void releaseGLObjects(const osg::ref_ptr<T>& object, osg::Stat
 }
 
 
+// OSGFILE include/osg/Vec3f
+
+//#include <osg/Vec2f>
+//#include <osg/Math>
+
+namespace osg {
+
+/** General purpose float triple for use as vertices, vectors and normals.
+  * Provides general math operations from addition through to cross products.
+  * No support yet added for float * Vec3f - is it necessary?
+  * Need to define a non-member non-friend operator*  etc.
+  * Vec3f * float is okay
+*/
+class Vec3f
+{
+    public:
+
+        /** Data type of vector components.*/
+        typedef float value_type;
+
+        /** Number of vector components. */
+        enum { num_components = 3 };
+
+        value_type _v[3];
+
+        /** Constructor that sets all components of the vector to zero */
+        Vec3f() { _v[0]=0.0f; _v[1]=0.0f; _v[2]=0.0f;}
+        Vec3f(value_type x,value_type y,value_type z) { _v[0]=x; _v[1]=y; _v[2]=z; }
+        Vec3f(const Vec2f& v2,value_type zz)
+        {
+            _v[0] = v2[0];
+            _v[1] = v2[1];
+            _v[2] = zz;
+        }
+
+
+        inline bool operator == (const Vec3f& v) const { return _v[0]==v._v[0] && _v[1]==v._v[1] && _v[2]==v._v[2]; }
+
+        inline bool operator != (const Vec3f& v) const { return _v[0]!=v._v[0] || _v[1]!=v._v[1] || _v[2]!=v._v[2]; }
+
+        inline bool operator <  (const Vec3f& v) const
+        {
+            if (_v[0]<v._v[0]) return true;
+            else if (_v[0]>v._v[0]) return false;
+            else if (_v[1]<v._v[1]) return true;
+            else if (_v[1]>v._v[1]) return false;
+            else return (_v[2]<v._v[2]);
+        }
+
+        inline value_type* ptr() { return _v; }
+        inline const value_type* ptr() const { return _v; }
+
+        inline void set( value_type x, value_type y, value_type z)
+        {
+            _v[0]=x; _v[1]=y; _v[2]=z;
+        }
+
+        inline void set( const Vec3f& rhs)
+        {
+            _v[0]=rhs._v[0]; _v[1]=rhs._v[1]; _v[2]=rhs._v[2];
+        }
+
+        inline value_type& operator [] (int i) { return _v[i]; }
+        inline value_type operator [] (int i) const { return _v[i]; }
+
+        inline value_type& x() { return _v[0]; }
+        inline value_type& y() { return _v[1]; }
+        inline value_type& z() { return _v[2]; }
+
+        inline value_type x() const { return _v[0]; }
+        inline value_type y() const { return _v[1]; }
+        inline value_type z() const { return _v[2]; }
+
+        /** Returns true if all components have values that are not NaN. */
+        inline bool valid() const { return !isNaN(); }
+        /** Returns true if at least one component has value NaN. */
+        inline bool isNaN() const { return osg::isNaN(_v[0]) || osg::isNaN(_v[1]) || osg::isNaN(_v[2]); }
+
+        /** Dot product. */
+        inline value_type operator * (const Vec3f& rhs) const
+        {
+            return _v[0]*rhs._v[0]+_v[1]*rhs._v[1]+_v[2]*rhs._v[2];
+        }
+
+        /** Cross product. */
+        inline const Vec3f operator ^ (const Vec3f& rhs) const
+        {
+            return Vec3f(_v[1]*rhs._v[2]-_v[2]*rhs._v[1],
+                         _v[2]*rhs._v[0]-_v[0]*rhs._v[2] ,
+                         _v[0]*rhs._v[1]-_v[1]*rhs._v[0]);
+        }
+
+        /** Multiply by scalar. */
+        inline const Vec3f operator * (value_type rhs) const
+        {
+            return Vec3f(_v[0]*rhs, _v[1]*rhs, _v[2]*rhs);
+        }
+
+        /** Unary multiply by scalar. */
+        inline Vec3f& operator *= (value_type rhs)
+        {
+            _v[0]*=rhs;
+            _v[1]*=rhs;
+            _v[2]*=rhs;
+            return *this;
+        }
+
+        /** Divide by scalar. */
+        inline const Vec3f operator / (value_type rhs) const
+        {
+            return Vec3f(_v[0]/rhs, _v[1]/rhs, _v[2]/rhs);
+        }
+
+        /** Unary divide by scalar. */
+        inline Vec3f& operator /= (value_type rhs)
+        {
+            _v[0]/=rhs;
+            _v[1]/=rhs;
+            _v[2]/=rhs;
+            return *this;
+        }
+
+        /** Binary vector add. */
+        inline const Vec3f operator + (const Vec3f& rhs) const
+        {
+            return Vec3f(_v[0]+rhs._v[0], _v[1]+rhs._v[1], _v[2]+rhs._v[2]);
+        }
+
+        /** Unary vector add. Slightly more efficient because no temporary
+          * intermediate object.
+        */
+        inline Vec3f& operator += (const Vec3f& rhs)
+        {
+            _v[0] += rhs._v[0];
+            _v[1] += rhs._v[1];
+            _v[2] += rhs._v[2];
+            return *this;
+        }
+
+        /** Binary vector subtract. */
+        inline const Vec3f operator - (const Vec3f& rhs) const
+        {
+            return Vec3f(_v[0]-rhs._v[0], _v[1]-rhs._v[1], _v[2]-rhs._v[2]);
+        }
+
+        /** Unary vector subtract. */
+        inline Vec3f& operator -= (const Vec3f& rhs)
+        {
+            _v[0]-=rhs._v[0];
+            _v[1]-=rhs._v[1];
+            _v[2]-=rhs._v[2];
+            return *this;
+        }
+
+        /** Negation operator. Returns the negative of the Vec3f. */
+        inline const Vec3f operator - () const
+        {
+            return Vec3f (-_v[0], -_v[1], -_v[2]);
+        }
+
+        /** Length of the vector = sqrt( vec . vec ) */
+        inline value_type length() const
+        {
+            return sqrtf( _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] );
+        }
+
+        /** Length squared of the vector = vec . vec */
+        inline value_type length2() const
+        {
+            return _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2];
+        }
+
+        /** Normalize the vector so that it has length unity.
+          * Returns the previous length of the vector.
+        */
+        inline value_type normalize()
+        {
+            value_type norm = Vec3f::length();
+            if (norm>0.0)
+            {
+                value_type inv = 1.0f/norm;
+                _v[0] *= inv;
+                _v[1] *= inv;
+                _v[2] *= inv;
+            }
+            return( norm );
+        }
+
+};    // end of class Vec3f
+
+/** multiply by vector components. */
+inline Vec3f componentMultiply(const Vec3f& lhs, const Vec3f& rhs)
+{
+    return Vec3f(lhs[0]*rhs[0], lhs[1]*rhs[1], lhs[2]*rhs[2]);
+}
+
+/** divide rhs components by rhs vector components. */
+inline Vec3f componentDivide(const Vec3f& lhs, const Vec3f& rhs)
+{
+    return Vec3f(lhs[0]/rhs[0], lhs[1]/rhs[1], lhs[2]/rhs[2]);
+}
+
+const Vec3f X_AXIS(1.0,0.0,0.0);
+const Vec3f Y_AXIS(0.0,1.0,0.0);
+const Vec3f Z_AXIS(0.0,0.0,1.0);
+
+}    // end of namespace osg
+
+
+// OSGFILE include/osg/Vec3d
+
+//#include <osg/Vec2d>
+//#include <osg/Vec3f>
+
+namespace osg {
+
+/** General purpose double triple for use as vertices, vectors and normals.
+  * Provides general math operations from addition through to cross products.
+  * No support yet added for double * Vec3d - is it necessary?
+  * Need to define a non-member non-friend operator*  etc.
+  *    Vec3d * double is okay
+*/
+
+class Vec3d
+{
+    public:
+
+        /** Data type of vector components.*/
+        typedef double value_type;
+
+        /** Number of vector components. */
+        enum { num_components = 3 };
+
+        value_type _v[3];
+
+        /** Constructor that sets all components of the vector to zero */
+        Vec3d() { _v[0]=0.0; _v[1]=0.0; _v[2]=0.0;}
+
+        inline Vec3d(const Vec3f& vec) { _v[0]=vec._v[0]; _v[1]=vec._v[1]; _v[2]=vec._v[2];}
+
+        inline operator Vec3f() const { return Vec3f(static_cast<float>(_v[0]),static_cast<float>(_v[1]),static_cast<float>(_v[2]));}
+
+        Vec3d(value_type x,value_type y,value_type z) { _v[0]=x; _v[1]=y; _v[2]=z; }
+        Vec3d(const Vec2d& v2,value_type zz)
+        {
+            _v[0] = v2[0];
+            _v[1] = v2[1];
+            _v[2] = zz;
+        }
+
+        inline bool operator == (const Vec3d& v) const { return _v[0]==v._v[0] && _v[1]==v._v[1] && _v[2]==v._v[2]; }
+
+        inline bool operator != (const Vec3d& v) const { return _v[0]!=v._v[0] || _v[1]!=v._v[1] || _v[2]!=v._v[2]; }
+
+        inline bool operator <  (const Vec3d& v) const
+        {
+            if (_v[0]<v._v[0]) return true;
+            else if (_v[0]>v._v[0]) return false;
+            else if (_v[1]<v._v[1]) return true;
+            else if (_v[1]>v._v[1]) return false;
+            else return (_v[2]<v._v[2]);
+        }
+
+        inline value_type* ptr() { return _v; }
+        inline const value_type* ptr() const { return _v; }
+
+        inline void set( value_type x, value_type y, value_type z)
+        {
+            _v[0]=x; _v[1]=y; _v[2]=z;
+        }
+
+        inline void set( const Vec3d& rhs)
+        {
+            _v[0]=rhs._v[0]; _v[1]=rhs._v[1]; _v[2]=rhs._v[2];
+        }
+
+        inline value_type& operator [] (int i) { return _v[i]; }
+        inline value_type operator [] (int i) const { return _v[i]; }
+
+        inline value_type& x() { return _v[0]; }
+        inline value_type& y() { return _v[1]; }
+        inline value_type& z() { return _v[2]; }
+
+        inline value_type x() const { return _v[0]; }
+        inline value_type y() const { return _v[1]; }
+        inline value_type z() const { return _v[2]; }
+
+        /** Returns true if all components have values that are not NaN. */
+        inline bool valid() const { return !isNaN(); }
+        /** Returns true if at least one component has value NaN. */
+        inline bool isNaN() const { return osg::isNaN(_v[0]) || osg::isNaN(_v[1]) || osg::isNaN(_v[2]); }
+
+        /** Dot product. */
+        inline value_type operator * (const Vec3d& rhs) const
+        {
+            return _v[0]*rhs._v[0]+_v[1]*rhs._v[1]+_v[2]*rhs._v[2];
+        }
+
+        /** Cross product. */
+        inline const Vec3d operator ^ (const Vec3d& rhs) const
+        {
+            return Vec3d(_v[1]*rhs._v[2]-_v[2]*rhs._v[1],
+                         _v[2]*rhs._v[0]-_v[0]*rhs._v[2] ,
+                         _v[0]*rhs._v[1]-_v[1]*rhs._v[0]);
+        }
+
+        /** Multiply by scalar. */
+        inline const Vec3d operator * (value_type rhs) const
+        {
+            return Vec3d(_v[0]*rhs, _v[1]*rhs, _v[2]*rhs);
+        }
+
+        /** Unary multiply by scalar. */
+        inline Vec3d& operator *= (value_type rhs)
+        {
+            _v[0]*=rhs;
+            _v[1]*=rhs;
+            _v[2]*=rhs;
+            return *this;
+        }
+
+        /** Divide by scalar. */
+        inline const Vec3d operator / (value_type rhs) const
+        {
+            return Vec3d(_v[0]/rhs, _v[1]/rhs, _v[2]/rhs);
+        }
+
+        /** Unary divide by scalar. */
+        inline Vec3d& operator /= (value_type rhs)
+        {
+            _v[0]/=rhs;
+            _v[1]/=rhs;
+            _v[2]/=rhs;
+            return *this;
+        }
+
+        /** Binary vector add. */
+        inline const Vec3d operator + (const Vec3d& rhs) const
+        {
+            return Vec3d(_v[0]+rhs._v[0], _v[1]+rhs._v[1], _v[2]+rhs._v[2]);
+        }
+
+        /** Unary vector add. Slightly more efficient because no temporary
+          * intermediate object.
+        */
+        inline Vec3d& operator += (const Vec3d& rhs)
+        {
+            _v[0] += rhs._v[0];
+            _v[1] += rhs._v[1];
+            _v[2] += rhs._v[2];
+            return *this;
+        }
+
+        /** Binary vector subtract. */
+        inline const Vec3d operator - (const Vec3d& rhs) const
+        {
+            return Vec3d(_v[0]-rhs._v[0], _v[1]-rhs._v[1], _v[2]-rhs._v[2]);
+        }
+
+        /** Unary vector subtract. */
+        inline Vec3d& operator -= (const Vec3d& rhs)
+        {
+            _v[0]-=rhs._v[0];
+            _v[1]-=rhs._v[1];
+            _v[2]-=rhs._v[2];
+            return *this;
+        }
+
+        /** Negation operator. Returns the negative of the Vec3d. */
+        inline const Vec3d operator - () const
+        {
+            return Vec3d (-_v[0], -_v[1], -_v[2]);
+        }
+
+        /** Length of the vector = sqrt( vec . vec ) */
+        inline value_type length() const
+        {
+            return sqrt( _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] );
+        }
+
+        /** Length squared of the vector = vec . vec */
+        inline value_type length2() const
+        {
+            return _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2];
+        }
+
+        /** Normalize the vector so that it has length unity.
+          * Returns the previous length of the vector.
+          * If the vector is zero length, it is left unchanged and zero is returned.
+        */
+        inline value_type normalize()
+        {
+            value_type norm = Vec3d::length();
+            if (norm>0.0)
+            {
+                value_type inv = 1.0/norm;
+                _v[0] *= inv;
+                _v[1] *= inv;
+                _v[2] *= inv;
+            }
+            return( norm );
+        }
+
+};    // end of class Vec3d
+
+/** multiply by vector components. */
+inline Vec3d componentMultiply(const Vec3d& lhs, const Vec3d& rhs)
+{
+    return Vec3d(lhs[0]*rhs[0], lhs[1]*rhs[1], lhs[2]*rhs[2]);
+}
+
+/** divide rhs components by rhs vector components. */
+inline Vec3d componentDivide(const Vec3d& lhs, const Vec3d& rhs)
+{
+    return Vec3d(lhs[0]/rhs[0], lhs[1]/rhs[1], lhs[2]/rhs[2]);
+}
+
+}    // end of namespace osg
+
+
+// OSGFILE include/osg/Vec4f
+
+//#include <osg/Vec3f>
+
+namespace osg {
+
+/** General purpose float quad. Uses include representation
+  * of color coordinates.
+  * No support yet added for float * Vec4f - is it necessary?
+  * Need to define a non-member non-friend operator*  etc.
+  *    Vec4f * float is okay
+*/
+class Vec4f
+{
+    public:
+
+        /** Data type of vector components.*/
+        typedef float value_type;
+
+        /** Number of vector components. */
+        enum { num_components = 4 };
+
+        /** Vec member variable. */
+        value_type _v[4];
+
+        // Methods are defined here so that they are implicitly inlined
+
+        /** Constructor that sets all components of the vector to zero */
+        Vec4f() { _v[0]=0.0f; _v[1]=0.0f; _v[2]=0.0f; _v[3]=0.0f;}
+
+        Vec4f(value_type x, value_type y, value_type z, value_type w)
+        {
+            _v[0]=x;
+            _v[1]=y;
+            _v[2]=z;
+            _v[3]=w;
+        }
+
+        Vec4f(const Vec3f& v3,value_type w)
+        {
+            _v[0]=v3[0];
+            _v[1]=v3[1];
+            _v[2]=v3[2];
+            _v[3]=w;
+        }
+
+        inline bool operator == (const Vec4f& v) const { return _v[0]==v._v[0] && _v[1]==v._v[1] && _v[2]==v._v[2] && _v[3]==v._v[3]; }
+
+        inline bool operator != (const Vec4f& v) const { return _v[0]!=v._v[0] || _v[1]!=v._v[1] || _v[2]!=v._v[2] || _v[3]!=v._v[3]; }
+
+        inline bool operator <  (const Vec4f& v) const
+        {
+            if (_v[0]<v._v[0]) return true;
+            else if (_v[0]>v._v[0]) return false;
+            else if (_v[1]<v._v[1]) return true;
+            else if (_v[1]>v._v[1]) return false;
+            else if (_v[2]<v._v[2]) return true;
+            else if (_v[2]>v._v[2]) return false;
+            else return (_v[3]<v._v[3]);
+        }
+
+        inline value_type* ptr() { return _v; }
+        inline const value_type* ptr() const { return _v; }
+
+        inline void set( value_type x, value_type y, value_type z, value_type w)
+        {
+            _v[0]=x; _v[1]=y; _v[2]=z; _v[3]=w;
+        }
+
+        inline value_type& operator [] (unsigned int i) { return _v[i]; }
+        inline value_type  operator [] (unsigned int i) const { return _v[i]; }
+
+        inline value_type& x() { return _v[0]; }
+        inline value_type& y() { return _v[1]; }
+        inline value_type& z() { return _v[2]; }
+        inline value_type& w() { return _v[3]; }
+
+        inline value_type x() const { return _v[0]; }
+        inline value_type y() const { return _v[1]; }
+        inline value_type z() const { return _v[2]; }
+        inline value_type w() const { return _v[3]; }
+
+        inline value_type& r() { return _v[0]; }
+        inline value_type& g() { return _v[1]; }
+        inline value_type& b() { return _v[2]; }
+        inline value_type& a() { return _v[3]; }
+
+        inline value_type r() const { return _v[0]; }
+        inline value_type g() const { return _v[1]; }
+        inline value_type b() const { return _v[2]; }
+        inline value_type a() const { return _v[3]; }
+
+        inline unsigned int asABGR() const
+        {
+            return (unsigned int)clampTo((_v[0]*255.0f),0.0f,255.0f)<<24 |
+                   (unsigned int)clampTo((_v[1]*255.0f),0.0f,255.0f)<<16 |
+                   (unsigned int)clampTo((_v[2]*255.0f),0.0f,255.0f)<<8  |
+                   (unsigned int)clampTo((_v[3]*255.0f),0.0f,255.0f);
+        }
+
+        inline unsigned int asRGBA() const
+        {
+            return (unsigned int)clampTo((_v[3]*255.0f),0.0f,255.0f)<<24 |
+                   (unsigned int)clampTo((_v[2]*255.0f),0.0f,255.0f)<<16 |
+                   (unsigned int)clampTo((_v[1]*255.0f),0.0f,255.0f)<<8  |
+                   (unsigned int)clampTo((_v[0]*255.0f),0.0f,255.0f);
+        }
+
+        /** Returns true if all components have values that are not NaN. */
+        inline bool valid() const { return !isNaN(); }
+        /** Returns true if at least one component has value NaN. */
+        inline bool isNaN() const { return osg::isNaN(_v[0]) || osg::isNaN(_v[1]) || osg::isNaN(_v[2]) || osg::isNaN(_v[3]); }
+
+        /** Dot product. */
+        inline value_type operator * (const Vec4f& rhs) const
+        {
+            return _v[0]*rhs._v[0]+
+                   _v[1]*rhs._v[1]+
+                   _v[2]*rhs._v[2]+
+                   _v[3]*rhs._v[3] ;
+        }
+
+        /** Multiply by scalar. */
+        inline Vec4f operator * (value_type rhs) const
+        {
+            return Vec4f(_v[0]*rhs, _v[1]*rhs, _v[2]*rhs, _v[3]*rhs);
+        }
+
+        /** Unary multiply by scalar. */
+        inline Vec4f& operator *= (value_type rhs)
+        {
+            _v[0]*=rhs;
+            _v[1]*=rhs;
+            _v[2]*=rhs;
+            _v[3]*=rhs;
+            return *this;
+        }
+
+        /** Divide by scalar. */
+        inline Vec4f operator / (value_type rhs) const
+        {
+            return Vec4f(_v[0]/rhs, _v[1]/rhs, _v[2]/rhs, _v[3]/rhs);
+        }
+
+        /** Unary divide by scalar. */
+        inline Vec4f& operator /= (value_type rhs)
+        {
+            _v[0]/=rhs;
+            _v[1]/=rhs;
+            _v[2]/=rhs;
+            _v[3]/=rhs;
+            return *this;
+        }
+
+        /** Binary vector add. */
+        inline Vec4f operator + (const Vec4f& rhs) const
+        {
+            return Vec4f(_v[0]+rhs._v[0], _v[1]+rhs._v[1],
+                         _v[2]+rhs._v[2], _v[3]+rhs._v[3]);
+        }
+
+        /** Unary vector add. Slightly more efficient because no temporary
+          * intermediate object.
+        */
+        inline Vec4f& operator += (const Vec4f& rhs)
+        {
+            _v[0] += rhs._v[0];
+            _v[1] += rhs._v[1];
+            _v[2] += rhs._v[2];
+            _v[3] += rhs._v[3];
+            return *this;
+        }
+
+        /** Binary vector subtract. */
+        inline Vec4f operator - (const Vec4f& rhs) const
+        {
+            return Vec4f(_v[0]-rhs._v[0], _v[1]-rhs._v[1],
+                         _v[2]-rhs._v[2], _v[3]-rhs._v[3] );
+        }
+
+        /** Unary vector subtract. */
+        inline Vec4f& operator -= (const Vec4f& rhs)
+        {
+            _v[0]-=rhs._v[0];
+            _v[1]-=rhs._v[1];
+            _v[2]-=rhs._v[2];
+            _v[3]-=rhs._v[3];
+            return *this;
+        }
+
+        /** Negation operator. Returns the negative of the Vec4f. */
+        inline const Vec4f operator - () const
+        {
+            return Vec4f (-_v[0], -_v[1], -_v[2], -_v[3]);
+        }
+
+        /** Length of the vector = sqrt( vec . vec ) */
+        inline value_type length() const
+        {
+            return sqrtf( _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] + _v[3]*_v[3]);
+        }
+
+        /** Length squared of the vector = vec . vec */
+        inline value_type length2() const
+        {
+            return _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] + _v[3]*_v[3];
+        }
+
+        /** Normalize the vector so that it has length unity.
+          * Returns the previous length of the vector.
+        */
+        inline value_type normalize()
+        {
+            value_type norm = Vec4f::length();
+            if (norm>0.0f)
+            {
+                value_type inv = 1.0f/norm;
+                _v[0] *= inv;
+                _v[1] *= inv;
+                _v[2] *= inv;
+                _v[3] *= inv;
+            }
+            return( norm );
+        }
+
+};    // end of class Vec4f
+
+/** Compute the dot product of a (Vec3,1.0) and a Vec4f. */
+inline Vec4f::value_type operator * (const Vec3f& lhs,const Vec4f& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+rhs[3];
+}
+
+/** Compute the dot product of a Vec4f and a (Vec3,1.0). */
+inline Vec4f::value_type operator * (const Vec4f& lhs,const Vec3f& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+lhs[3];
+}
+
+/** multiply by vector components. */
+inline Vec4f componentMultiply(const Vec4f& lhs, const Vec4f& rhs)
+{
+    return Vec4f(lhs[0]*rhs[0], lhs[1]*rhs[1], lhs[2]*rhs[2], lhs[3]*rhs[3]);
+}
+
+/** divide rhs components by rhs vector components. */
+inline Vec4f componentDivide(const Vec4f& lhs, const Vec4f& rhs)
+{
+    return Vec4f(lhs[0]/rhs[0], lhs[1]/rhs[1], lhs[2]/rhs[2], lhs[3]/rhs[3]);
+}
+
+}    // end of namespace osg
+
+
+// OSGFILE include/osg/Vec4d
+
+//#include <osg/Vec3d>
+//#include <osg/Vec4f>
+
+namespace osg {
+
+/** General purpose double quad. Uses include representation
+  * of color coordinates.
+  * No support yet added for double * Vec4d - is it necessary?
+  * Need to define a non-member non-friend operator*  etc.
+  * Vec4d * double is okay
+*/
+class Vec4d
+{
+    public:
+
+        /** Data type of vector components.*/
+        typedef double value_type;
+
+        /** Number of vector components. */
+        enum { num_components = 4 };
+
+        value_type _v[4];
+
+        /** Constructor that sets all components of the vector to zero */
+        Vec4d() { _v[0]=0.0; _v[1]=0.0; _v[2]=0.0; _v[3]=0.0; }
+
+        Vec4d(value_type x, value_type y, value_type z, value_type w)
+        {
+            _v[0]=x;
+            _v[1]=y;
+            _v[2]=z;
+            _v[3]=w;
+        }
+
+        Vec4d(const Vec3d& v3,value_type w)
+        {
+            _v[0]=v3[0];
+            _v[1]=v3[1];
+            _v[2]=v3[2];
+            _v[3]=w;
+        }
+
+        inline Vec4d(const Vec4f& vec) { _v[0]=vec._v[0]; _v[1]=vec._v[1]; _v[2]=vec._v[2]; _v[3]=vec._v[3];}
+
+        inline operator Vec4f() const { return Vec4f(static_cast<float>(_v[0]),static_cast<float>(_v[1]),static_cast<float>(_v[2]),static_cast<float>(_v[3]));}
+
+
+        inline bool operator == (const Vec4d& v) const { return _v[0]==v._v[0] && _v[1]==v._v[1] && _v[2]==v._v[2] && _v[3]==v._v[3]; }
+
+        inline bool operator != (const Vec4d& v) const { return _v[0]!=v._v[0] || _v[1]!=v._v[1] || _v[2]!=v._v[2] || _v[3]!=v._v[3]; }
+
+        inline bool operator <  (const Vec4d& v) const
+        {
+            if (_v[0]<v._v[0]) return true;
+            else if (_v[0]>v._v[0]) return false;
+            else if (_v[1]<v._v[1]) return true;
+            else if (_v[1]>v._v[1]) return false;
+            else if (_v[2]<v._v[2]) return true;
+            else if (_v[2]>v._v[2]) return false;
+            else return (_v[3]<v._v[3]);
+        }
+
+        inline value_type* ptr() { return _v; }
+        inline const value_type* ptr() const { return _v; }
+
+        inline void set( value_type x, value_type y, value_type z, value_type w)
+        {
+            _v[0]=x; _v[1]=y; _v[2]=z; _v[3]=w;
+        }
+
+        inline value_type& operator [] (unsigned int i) { return _v[i]; }
+        inline value_type  operator [] (unsigned int i) const { return _v[i]; }
+
+        inline value_type& x() { return _v[0]; }
+        inline value_type& y() { return _v[1]; }
+        inline value_type& z() { return _v[2]; }
+        inline value_type& w() { return _v[3]; }
+
+        inline value_type x() const { return _v[0]; }
+        inline value_type y() const { return _v[1]; }
+        inline value_type z() const { return _v[2]; }
+        inline value_type w() const { return _v[3]; }
+
+        inline value_type& r() { return _v[0]; }
+        inline value_type& g() { return _v[1]; }
+        inline value_type& b() { return _v[2]; }
+        inline value_type& a() { return _v[3]; }
+
+        inline value_type r() const { return _v[0]; }
+        inline value_type g() const { return _v[1]; }
+        inline value_type b() const { return _v[2]; }
+        inline value_type a() const { return _v[3]; }
+
+
+        inline unsigned int asABGR() const
+        {
+            return (unsigned int)clampTo((_v[0]*255.0),0.0,255.0)<<24 |
+                   (unsigned int)clampTo((_v[1]*255.0),0.0,255.0)<<16 |
+                   (unsigned int)clampTo((_v[2]*255.0),0.0,255.0)<<8  |
+                   (unsigned int)clampTo((_v[3]*255.0),0.0,255.0);
+        }
+
+        inline unsigned int asRGBA() const
+        {
+            return (unsigned int)clampTo((_v[3]*255.0),0.0,255.0)<<24 |
+                   (unsigned int)clampTo((_v[2]*255.0),0.0,255.0)<<16 |
+                   (unsigned int)clampTo((_v[1]*255.0),0.0,255.0)<<8  |
+                   (unsigned int)clampTo((_v[0]*255.0),0.0,255.0);
+        }
+
+        /** Returns true if all components have values that are not NaN. */
+        inline bool valid() const { return !isNaN(); }
+        /** Returns true if at least one component has value NaN. */
+        inline bool isNaN() const { return osg::isNaN(_v[0]) || osg::isNaN(_v[1]) || osg::isNaN(_v[2]) || osg::isNaN(_v[3]); }
+
+        /** Dot product. */
+        inline value_type operator * (const Vec4d& rhs) const
+        {
+            return _v[0]*rhs._v[0]+
+                   _v[1]*rhs._v[1]+
+                   _v[2]*rhs._v[2]+
+                   _v[3]*rhs._v[3] ;
+        }
+
+        /** Multiply by scalar. */
+        inline Vec4d operator * (value_type rhs) const
+        {
+            return Vec4d(_v[0]*rhs, _v[1]*rhs, _v[2]*rhs, _v[3]*rhs);
+        }
+
+        /** Unary multiply by scalar. */
+        inline Vec4d& operator *= (value_type rhs)
+        {
+            _v[0]*=rhs;
+            _v[1]*=rhs;
+            _v[2]*=rhs;
+            _v[3]*=rhs;
+            return *this;
+        }
+
+        /** Divide by scalar. */
+        inline Vec4d operator / (value_type rhs) const
+        {
+            return Vec4d(_v[0]/rhs, _v[1]/rhs, _v[2]/rhs, _v[3]/rhs);
+        }
+
+        /** Unary divide by scalar. */
+        inline Vec4d& operator /= (value_type rhs)
+        {
+            _v[0]/=rhs;
+            _v[1]/=rhs;
+            _v[2]/=rhs;
+            _v[3]/=rhs;
+            return *this;
+        }
+
+        /** Binary vector add. */
+        inline Vec4d operator + (const Vec4d& rhs) const
+        {
+            return Vec4d(_v[0]+rhs._v[0], _v[1]+rhs._v[1],
+                         _v[2]+rhs._v[2], _v[3]+rhs._v[3]);
+        }
+
+        /** Unary vector add. Slightly more efficient because no temporary
+          * intermediate object.
+        */
+        inline Vec4d& operator += (const Vec4d& rhs)
+        {
+            _v[0] += rhs._v[0];
+            _v[1] += rhs._v[1];
+            _v[2] += rhs._v[2];
+            _v[3] += rhs._v[3];
+            return *this;
+        }
+
+        /** Binary vector subtract. */
+        inline Vec4d operator - (const Vec4d& rhs) const
+        {
+            return Vec4d(_v[0]-rhs._v[0], _v[1]-rhs._v[1],
+                         _v[2]-rhs._v[2], _v[3]-rhs._v[3] );
+        }
+
+        /** Unary vector subtract. */
+        inline Vec4d& operator -= (const Vec4d& rhs)
+        {
+            _v[0]-=rhs._v[0];
+            _v[1]-=rhs._v[1];
+            _v[2]-=rhs._v[2];
+            _v[3]-=rhs._v[3];
+            return *this;
+        }
+
+        /** Negation operator. Returns the negative of the Vec4d. */
+        inline const Vec4d operator - () const
+        {
+            return Vec4d (-_v[0], -_v[1], -_v[2], -_v[3]);
+        }
+
+        /** Length of the vector = sqrt( vec . vec ) */
+        inline value_type length() const
+        {
+            return sqrt( _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] + _v[3]*_v[3]);
+        }
+
+        /** Length squared of the vector = vec . vec */
+        inline value_type length2() const
+        {
+            return _v[0]*_v[0] + _v[1]*_v[1] + _v[2]*_v[2] + _v[3]*_v[3];
+        }
+
+        /** Normalize the vector so that it has length unity.
+          * Returns the previous length of the vector.
+        */
+        inline value_type normalize()
+        {
+            value_type norm = Vec4d::length();
+            if (norm>0.0f)
+            {
+                value_type inv = 1.0/norm;
+                _v[0] *= inv;
+                _v[1] *= inv;
+                _v[2] *= inv;
+                _v[3] *= inv;
+            }
+            return( norm );
+        }
+
+};    // end of class Vec4d
+
+
+
+/** Compute the dot product of a (Vec3,1.0) and a Vec4d. */
+inline Vec4d::value_type operator * (const Vec3d& lhs,const Vec4d& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+rhs[3];
+}
+
+/** Compute the dot product of a (Vec3,1.0) and a Vec4d. */
+inline Vec4d::value_type operator * (const Vec3f& lhs,const Vec4d& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+rhs[3];
+}
+
+/** Compute the dot product of a (Vec3,1.0) and a Vec4d. */
+inline Vec4d::value_type operator * (const Vec3d& lhs,const Vec4f& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+rhs[3];
+}
+
+
+/** Compute the dot product of a Vec4d and a (Vec3,1.0). */
+inline Vec4d::value_type operator * (const Vec4d& lhs,const Vec3d& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+lhs[3];
+}
+
+/** Compute the dot product of a Vec4d and a (Vec3,1.0). */
+inline Vec4d::value_type operator * (const Vec4d& lhs,const Vec3f& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+lhs[3];
+}
+
+/** Compute the dot product of a Vec4d and a (Vec3,1.0). */
+inline Vec4d::value_type operator * (const Vec4f& lhs,const Vec3d& rhs)
+{
+    return lhs[0]*rhs[0]+lhs[1]*rhs[1]+lhs[2]*rhs[2]+lhs[3];
+}
+
+/** multiply by vector components. */
+inline Vec4d componentMultiply(const Vec4d& lhs, const Vec4d& rhs)
+{
+    return Vec4d(lhs[0]*rhs[0], lhs[1]*rhs[1], lhs[2]*rhs[2], lhs[3]*rhs[3]);
+}
+
+/** divide rhs components by rhs vector components. */
+inline Vec4d componentDivide(const Vec4d& lhs, const Vec4d& rhs)
+{
+    return Vec4d(lhs[0]/rhs[0], lhs[1]/rhs[1], lhs[2]/rhs[2], lhs[3]/rhs[3]);
+}
+
+}    // end of namespace osg
+
+
 // OSGFILE include/osg/Quat
 
 /*
