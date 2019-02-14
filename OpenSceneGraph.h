@@ -3988,6 +3988,17 @@ inline Vec4d componentDivide(const Vec4d& lhs, const Vec4d& rhs)
 }    // end of namespace osg
 
 
+// OSGFILE include/osg/Vec4
+
+//#include <osg/Vec4f>
+
+namespace osg {
+
+    typedef Vec4f Vec4;
+
+}
+
+
 // OSGFILE include/osg/Quat
 
 /*
